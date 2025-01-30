@@ -1,0 +1,50 @@
+﻿@using EasyTracker.data
+<main>
+    <div class="bg-white shadow rounded-lg p-6">
+        @if (ExpenseList.Any())
+        {
+            <table class="w-full">
+                <thead>
+                <tr>
+                    <th class="text-left pb-3">Name</th>
+                    <th class="text-left pb-3">Amount</th>
+                    <th class="text-left pb-3">Monthly</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in ExpenseList)
+                {
+                    <tr class="border-t hover:bg-gray-50">
+                        <td class="py-2">@item.Name</td>
+                        <td class="py-2">@item.Amount.ToString("F2")</td>
+                        <td class="py-2">
+                            @if (item.Monthly)
+                            {
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+                                    Yes
+                                </span>
+                            }
+
+                            else
+                            {
+                                <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-sm">
+                                    No
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+        
+        else
+        {
+            <p>There are no Expenses yet!</p>
+        }
+    </div>
+</main>
+
+@code {
+    [Parameter] public List<Expense> ExpenseList { get; set; } = new();
+}

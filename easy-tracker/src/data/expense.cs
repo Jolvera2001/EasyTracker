@@ -6,7 +6,7 @@ namespace EasyTracker.data;
 public class Expense
 {
     public Guid Id { get; set; }
-    public required string Name { get; set; }
-    public required double Amount { get; set; }
-    public required bool Monthly { get; set; }
+    public string Name { get; set; }
+    public double Amount { get; set; }
+    public bool Monthly { get; set; }
 }

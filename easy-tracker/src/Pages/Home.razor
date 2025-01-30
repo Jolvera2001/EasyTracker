@@ -1,43 +1,24 @@
 ﻿@page "/"
 @inject IJSRuntime JsRuntime
 @using data
+@using EasyTracker.Components
 
 <main>
-    <div class="bg-white shadow rounded-lg p-6">
-        <table class="w-full">
-            <thead>
-                <tr>
-                    <th class="text-left pb-3">Name</th>
-                    <th class="text-left pb-3">Amount</th>
-                    <th class="text-left pb-3">Monthly</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in expenseList)
-                {
-                    <tr class="border-t hover:bg-gray-50">
-                        <td class="py-2">@item.Name</td>
-                        <td class="py-2">@item.Amount.ToString("F2")</td>
-                        <td class="py-2">
-                            @if (item.Monthly)
-                            {
-                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
-                                    yes
-                                </span>
-                            } 
-                            
-                            else 
-                            {
-                                <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-sm">
-                                    No
-                                </span>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+    <h1 class="text-2xl font-bold mb-4">Expenses</h1>
+    
+    <button
+        @onclick="() => showAddDialog = true"
+        class="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        Add Expense
+    </button>
+    
+    <ExpenseGrid ExpenseList="@Expenses"/>
+
+    <AddExpenseDialog
+        IsVisible="@showAddDialog"
+        OnSave="HandleSaveExpense"
+        OnClose="() => showAddDialog = false" />
+    
     <div class="bg-white p-6 rounded-lg shadow-lg">
         <h2 class="text-xl font-semibold mb-4">Expense Trends</h2>
         <Chart Config="_config1" @ref="_chart1"></Chart>
@@ -48,30 +29,14 @@
 {
     private LineChartConfig? _config1;
     private Chart? _chart1;
-    private List<Expense> expenseList { get; set; } = new() 
-        {
-            new Expense 
-            {
-                Id = Guid.NewGuid(),
-                Name = "First Expense",
-                Amount = 120.18,
-                Monthly = true,
-            },
-            new Expense 
-            {
-                Id = Guid.NewGuid(),
-                Name = "Second Expense",
-                Amount = 20.25,
-                Monthly = false,
-            },
-            new Expense 
-            {
-                Id = Guid.NewGuid(),
-                Name = "Third Expense",
-                Amount = 1020.00,
-                Monthly = true,
-            } 
-        };
+    private List<Expense> Expenses { get; set; } = new();
+    private bool showAddDialog;
+
+    private async Task HandleSaveExpense(Expense expense)
+    {
+        Expenses.Add(expense);
+        showAddDialog = false;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -91,13 +56,13 @@
                     }
                 }
             };
-        _config1.Data.Labels = expenseList.Select(e => e.Name).ToList();
+        _config1.Data.Labels = Expenses.Select(e => e.Name).ToList();
         
         // Add dataset for expenses
         _config1.Data.Datasets.Add(new LineDataset
         {
             Label = "Expense Amounts",
-            Data = expenseList.Select(e => (decimal?)e.Amount).ToList(),
+            Data = Expenses.Select(e => (decimal?)e.Amount).ToList(),
             BorderColor = "#3B82F6", // Tailwind blue-500
             BackgroundColor = "rgba(59, 130, 246, 0.1)", // Transparent blue
             Fill = true
@@ -107,7 +72,7 @@
         var monthlyExpenses = new LineDataset
         {
             Label = "Monthly Expenses",
-            Data = expenseList.Where(e => e.Monthly)
+            Data = Expenses.Where(e => e.Monthly)
                             .Select(e => (decimal?)e.Amount)  // Convert to decimal?
                             .ToList(),
             BorderColor = "#10B981",
@@ -117,7 +82,7 @@
         var nonMonthlyExpenses = new LineDataset
         {
             Label = "One-time Expenses",
-            Data = expenseList.Where(e => !e.Monthly)
+            Data = Expenses.Where(e => !e.Monthly)
                             .Select(e => (decimal?)e.Amount)  // Convert to decimal?
                             .ToList(),
             BorderColor = "#EF4444",
