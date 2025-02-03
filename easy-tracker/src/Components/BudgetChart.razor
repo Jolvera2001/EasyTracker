@@ -1,39 +1,14 @@
-﻿@page "/"
-@inject IJSRuntime JsRuntime
-@using data
-@using EasyTracker.Components
+﻿@using data
 
-<main>
-    <h1 class="text-2xl font-bold mb-4">Expenses</h1>
-    
-    <button
-        @onclick="() => showAddDialog = true"
-        class="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-        Add Expense
-    </button>
-    
-    <ExpenseGrid ExpenseList="@Expenses"/>
+<div class="bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-xl font-semibold mb-4">Expense Trends</h2>
+    <Chart Config="_config1" @ref="_chart1"></Chart>
+</div>
 
-    <AddExpenseDialog
-        IsVisible="@showAddDialog"
-        OnSave="HandleSaveExpense"
-        OnClose="() => showAddDialog = false" />
-    
-    <BudgetChart Expenses="@Expenses" />
-</main>
-
-@code
-{
+@code {
+    [Parameter] public List<data.Expense> Expenses { get; set; }
     private LineChartConfig? _config1;
     private Chart? _chart1;
-    private List<Expense> Expenses { get; set; } = new();
-    private bool showAddDialog;
-
-    private async Task HandleSaveExpense(Expense expense)
-    {
-        Expenses.Add(expense);
-        showAddDialog = false;
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -87,10 +62,4 @@
             Fill = true
         };
     }
-
-    @* private async Task GreetAsync()
-    {
-        GreetMsg = await JsRuntime.InvokeAsync<string>("__TAURI__.core.invoke", "greet", new { name = GreetInput });
-    } *@
-    @* this is a good example of how to invoke rust commands *@
 }
